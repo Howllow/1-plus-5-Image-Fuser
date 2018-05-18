@@ -7,12 +7,13 @@ from matplotlib import pyplot as plt
 
 #input images
 address = "/Users/howllow/Desktop/"
-upleft = cv2.imread(address + "upleft2.jpeg")
-bottomleft = cv2.imread(address + "bottomleft2.jpeg")
-upright = cv2.imread(address + "upright2.jpeg")
-bottomright = cv2.imread(address + "bottomright2.jpeg")
-up = cv2.imread(address + "up2.jpeg")
-human = cv2.imread(address + "human2.jpeg")
+upleft = cv2.imread(address + "upleft3.jpeg")
+bottomleft = cv2.imread(address + "bottomleft3.jpeg")
+upright = cv2.imread(address + "upright3.jpeg")
+bottomright = cv2.imread(address + "bottomright3.jpeg")
+up = cv2.imread(address + "up3.jpeg")
+human = cv2.imread(address + "human3.jpeg")
+orihuman = human
 human = cv2.copyMakeBorder(human, human.shape[0], 0, human.shape[1]//2,
                           human.shape[1]//2, cv2.BORDER_CONSTANT,value = [0, 0, 0])
 
@@ -119,9 +120,13 @@ def stitch2(image1, image2):
         for n in range(human.shape[1]) :
             if (image2[m][n] != [0, 0, 0]).any() and (image1[m][n] == [0, 0, 0]).all():
                 back[m][n] = image2[m][n]
+            if (image1[m][n] != [0, 0, 0]).all() and (image2[m][n] != [0, 0, 0]).all():
+                if (image2[m][n] > image1[m][n]).all():
+                    back[m][n] = image2[m][n]
     return back
 
 
+#get background
 back_up = stitch2(changeul, changeur)
 cv2.imshow('backup', back_up)
 cv2.imwrite(address + "backup.jpeg", back_up)
@@ -134,8 +139,13 @@ cv2.imwrite(address + "backub.jpeg", back_ub)
 back_all = stitch2(changeu, back_ub)
 cv2.imshow('back_all', back_all)
 cv2.imwrite(address + "backall.jpeg", back_all)
-res = stitch2(human, back_all)
-cv2.imshow('res', res)
+
+
+#clone human to background
+center = (human.shape[1] // 2, (human.shape[0] // 4) * 3)
+mask = 255 * np.ones(orihuman.shape, orihuman.dtype)
+res = cv2.seamlessClone(orihuman, back_all, mask, center, cv2.NORMAL_CLONE)
+
 
 cv2.imwrite('/Users/howllow/Desktop/final.jpeg', res)
 

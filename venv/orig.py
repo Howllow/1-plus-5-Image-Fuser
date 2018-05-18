@@ -7,9 +7,9 @@ from matplotlib import pyplot as plt
 
 MIN_MATCH_COUNT = 10
 
-img1 = cv2.imread("/Users/howllow/Desktop/bottomleft2.jpeg")
-img2 = cv2.imread("/Users/howllow/Desktop/up2.jpeg")
-human = cv2.imread("/Users/howllow/Desktop/human2.jpeg")
+img1 = cv2.imread("/Users/howllow/Desktop/c2.png")
+img2 = cv2.imread("/Users/howllow/Desktop/c3.png")
+human = cv2.imread("/Users/howllow/Desktop/c1.png")
 human = cv2.copyMakeBorder(human, human.shape[0], 0, human.shape[1]//2,
                           human.shape[1]//2, cv2.BORDER_CONSTANT,value = [0, 0, 0])
 gray1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
@@ -21,9 +21,6 @@ if img1 is None or img2 is None or human is None :
     print("Reading Image Failed")
     quit()
 
-#cv2.imshow("image1", img1)
-#cv2.imshow("image2", img2)
-#cv2.imshow("human", human)
 
 #get sift feature
 Sift = cv2.xfeatures2d.SIFT_create(800)
@@ -66,36 +63,31 @@ cv2.imshow('change2', change2)
 draw_params1 = dict(matchesMask = matchesMask1, flags = 2)
 draw_params2 = dict(matchesMask = matchesMask2, flags = 2)
 m1 = cv2.drawMatches(img1, kp1, human, kph, good1, None, **draw_params1)
-cv2.imshow('test1', m1)
+#cv2.imshow('test1', m1)
 m2 = cv2.drawMatches(img2, kp2, human, kph, good2, None, **draw_params2)
-cv2.imshow('test2', m2)
+#cv2.imshow('test2', m2)
 
-cv2.imwrite('/Users/howllow/Desktop/out1.jpg', change1)
-cv2.imwrite('/Users/howllow/Desktop/out2.jpg', change2)
-cv2.imwrite('/Users/howllow/Desktop/person.jpg', human)
-res1 = Image.open('/Users/howllow/Desktop/out1.jpg')
-res2 = Image.open('/Users/howllow/Desktop/out2.jpg')
-person = Image.open('/Users/howllow/Desktop/person.jpg')
-
-'''person1 = Image.blend(person, res1, 0.7)
-person2 = Image.blend(person, res2, 0.7)
-person = Image.blend(person1, person2, 0.5)
-person.show()
-person.save('/Users/howllow/Desktop/final.png')'''
 m = 0
 n = 0
+mask = np.zeros(change2.shape, change2.dtype)
+poly = np.array([ [515, 241], [515, 602], [779, 282], [750, 583] ], np.int32)
+cv2.fillPoly(mask, [poly], (255, 255, 255))
+center = (611, 440)
 print(human.shape[0])
+back = change1
 for m in range(human.shape[0]) :
     for n in range(human.shape[1]) :
-        if  (change1[m][n]!=[0,0,0]).all() and (human[m][n]==[0,0,0]).all():
-            human[m][n] = change1[m][n]
-        if  (change2[m][n]!=[0,0,0]).all() and (human[m][n]==[0,0,0]).all():
-            human[m][n] = change2[m][n]
+        if  (change1[m][n]!=[0,0,0]).any() and (change2[m][n]==[0,0,0]).all():
+            change2[m][n] = change1[m][n]
+        if (change1[m][n] != [0, 0, 0]).all() and (change2[m][n] != [0, 0, 0]).all():
+            if (change1[m][n] > change2[m][n]).all():
+                change2[m][n] = change1[m][n]
+
+
+#clone = cv2.seamlessClone(back, change2, mask, center, cv2.NORMAL_CLONE)
 
 
 
-
-cv2.imshow('res', human)
-cv2.imwrite('/Users/howllow/Desktop/final.png', human)
+cv2.imshow('res', change2)
 
 cv2.waitKey(0)
