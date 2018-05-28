@@ -6,13 +6,13 @@ from PIL import Image
 from matplotlib import pyplot as plt
 
 #input images
-address = "/Users/howllow/Desktop/"
-upleft = cv2.imread(address + "upleft3.jpeg")
-bottomleft = cv2.imread(address + "bottomleft3.jpeg")
-upright = cv2.imread(address + "upright3.jpeg")
-bottomright = cv2.imread(address + "bottomright3.jpeg")
-up = cv2.imread(address + "up3.jpeg")
-human = cv2.imread(address + "human3.jpeg")
+address = "/Users/howllow/Documents/images/"
+upleft = cv2.imread(address + "upleft4.jpeg")
+bottomleft = cv2.imread(address + "bottomleft4.jpeg")
+upright = cv2.imread(address + "upright4.jpeg")
+bottomright = cv2.imread(address + "bottomright4.jpeg")
+up = cv2.imread(address + "up4.jpeg")
+human = cv2.imread(address + "human4.jpeg")
 orihuman = human
 human = cv2.copyMakeBorder(human, human.shape[0], 0, human.shape[1]//2,
                           human.shape[1]//2, cv2.BORDER_CONSTANT,value = [0, 0, 0])
@@ -77,15 +77,15 @@ def Warp(good, kp, image):
 
 
 matchesMaskul, changeul = Warp(goodul, kpul, upleft)
-cv2.imwrite('/Users/howllow/Desktop/c_ul.jpeg', changeul)
+cv2.imwrite(address + 'c_ul.jpeg', changeul)
 matchesMaskbl, changebl = Warp(goodbl, kpbl, bottomleft)
-cv2.imwrite('/Users/howllow/Desktop/c_bl.jpeg', changebl)
+cv2.imwrite(address + 'c_bl.jpeg', changebl)
 matchesMaskur, changeur = Warp(goodur, kpur, upright)
-cv2.imwrite('/Users/howllow/Desktop/c_ur.jpeg', changeur)
+cv2.imwrite(address + 'c_ur.jpeg', changeur)
 matchesMaskbr, changebr = Warp(goodbr, kpbr, bottomright)
-cv2.imwrite('/Users/howllow/Desktop/c_br.jpeg', changebr)
+cv2.imwrite(address + 'c_br.jpeg', changebr)
 matchesMasku, changeu = Warp(goodu, kpu, up)
-cv2.imwrite('/Users/howllow/Desktop/c_u.jpeg', changeu)
+cv2.imwrite(address + 'c_u.jpeg', changeu)
 
 
 #draw
@@ -102,15 +102,15 @@ m_u = cv2.drawMatches(up, kpu, human, kph, goodu, None, **draw_paramsu)
 
 
 cv2.imshow('upleftmatch', m_ul)
-cv2.imwrite('/Users/howllow/Desktop/m_ul.jpeg', m_ul)
+cv2.imwrite(address + 'm_ul.jpeg', m_ul)
 cv2.imshow('bottomleftmatch', m_bl)
-cv2.imwrite('/Users/howllow/Desktop/m_bl.jpeg', m_bl)
+cv2.imwrite(address + 'm_bl.jpeg', m_bl)
 cv2.imshow('uprightmatch', m_ur)
-cv2.imwrite('/Users/howllow/Desktop/m_ur.jpeg', m_ur)
+cv2.imwrite(address + 'm_ur.jpeg', m_ur)
 cv2.imshow('bottomrightmatch', m_br)
-cv2.imwrite('/Users/howllow/Desktop/m_br.jpeg', m_br)
+cv2.imwrite(address + 'm_br.jpeg', m_br)
 cv2.imshow('upmatch', m_u)
-cv2.imwrite('/Users/howllow/Desktop/m_u.jpeg', m_u)
+cv2.imwrite(address + 'm_u.jpeg', m_u)
 
 
 #stitch!
@@ -136,7 +136,7 @@ cv2.imwrite(address + "backb.jpeg", back_bottom)
 back_ub = stitch2(back_bottom, back_up)
 cv2.imshow('backub', back_ub)
 cv2.imwrite(address + "backub.jpeg", back_ub)
-back_all = stitch2(changeu, back_ub)
+back_all = stitch2(back_ub, changeu)
 cv2.imshow('back_all', back_all)
 cv2.imwrite(address + "backall.jpeg", back_all)
 
@@ -147,7 +147,7 @@ mask = 255 * np.ones(orihuman.shape, orihuman.dtype)
 res = cv2.seamlessClone(orihuman, back_all, mask, center, cv2.NORMAL_CLONE)
 
 
-cv2.imwrite('/Users/howllow/Desktop/final.jpeg', res)
+cv2.imwrite(address + 'final.jpeg', res)
 
 
 cv2.waitKey(0)
