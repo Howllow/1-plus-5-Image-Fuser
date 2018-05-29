@@ -107,7 +107,7 @@ for i in range(1, cnt):
     mask_add = cv2.threshold(cv2.cvtColor(img_w, cv2.COLOR_BGR2GRAY), 0, 255, cv2.THRESH_BINARY)[1]
     out = computeAlphaBlending(out, mask_origin, img_w, mask_add)
 
-cv2.imwrite(address + 'wha.jpeg', out)
+cv2.imwrite(address + 'result.jpeg', out)
 
 
 cv2.namedWindow('result', 0)
