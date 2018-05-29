@@ -21,7 +21,7 @@ def warp (srcImage, dstImage):
     # ratio test
     good = []
     for m, n in matches:
-        if m.distance < 0.74 * n.distance:
+        if m.distance < 0.73 * n.distance:
             good.append(m)
 
     # Get warped images
