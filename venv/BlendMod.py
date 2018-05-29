@@ -1,8 +1,8 @@
 import cv2
 import numpy as np
 import cmath
-from WarpModel import warp
-from FaceDectModel import FaceDetect
+from WarpMod import warp
+from FaceDectMod import FaceDetect
 
 def computeAlphaBlending(i1, m1, i2, m2):
     bothmask = cv2.bitwise_or(m1, m2)
