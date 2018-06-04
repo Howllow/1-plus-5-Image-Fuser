@@ -4,6 +4,7 @@ import cmath
 from WarpMod import warp
 from FaceDectMod import FaceDetect
 
+
 def computeAlphaBlending(i1, m1, i2, m2):
     bothmask = cv2.bitwise_or(m1, m2)
     nomask = cv2.bitwise_not(bothmask)
@@ -23,7 +24,7 @@ def computeAlphaBlending(i1, m1, i2, m2):
     d2 = cv2.convertScaleAbs(cv2.threshold(dist2, 0, 255, cv2.THRESH_BINARY)[1])
     tmp_mask = cv2.bitwise_and(m2, d2)
     minVal, maxVal, minLoc, maxLoc = cv2.minMaxLoc(dist2, tmp_mask)
-    dist2 = (dist2 * 1.0)  / maxVal
+    dist2 = (dist2 * 1.0) / maxVal
 
     dist1Masked = cv2.add(rawAlpha, 0, mask=nomask)
     tmp = cv2.add(dist1, 0, mask=m1)
@@ -66,52 +67,36 @@ def border(mask):
 
     border = cv2.magnitude(x, y)
 
-
     return cv2.threshold(border, 0, 255, cv2.THRESH_BINARY)[1]
 
 
-img = []
+def blendProcess(img):
+    address = "./image/"
+    cnt = len(img)
+    for i in range(0, cnt):
+        bias = np.ones(img[i].shape, dtype=np.uint8)
+        img[i] = cv2.add(img[i], bias)
+    img[0] = cv2.copyMakeBorder(img[0], img[0].shape[0], 0, img[0].shape[1] // 2,
+                                img[0].shape[1] // 2, cv2.BORDER_CONSTANT, value=[0, 0, 0])
+    (row, col) = (img[0].shape[0], img[0].shape[1])
+    out = img[0]
+    faces = FaceDetect(img[0])
+    hx, hy, hw, hh = faces
+    '''
+    tst = img[0]
+    cv2.rectangle(tst, (hx, hy), (hx + hw, hy + hh), (0, 255, 0), 2)
+    cv2.imshow('face', tst)
+    cv2.imwrite(address + 'facetest.jpeg', tst)
+    '''
+    for i in range(1, cnt):
+        img_w = warp(img[i], out)
+        img_w[hy - hh // 4: row, hx - int(hw * 1.5): hx + int(hw * 2.5)] = 0
+        mask_origin = cv2.threshold(cv2.cvtColor(out, cv2.COLOR_BGR2GRAY), 0, 255, cv2.THRESH_BINARY)[1]
+        mask_add = cv2.threshold(cv2.cvtColor(img_w, cv2.COLOR_BGR2GRAY), 0, 255, cv2.THRESH_BINARY)[1]
+        out = computeAlphaBlending(out, mask_origin, img_w, mask_add)
 
-address = "/Users/howllow/Documents/images/"
-img.append(cv2.imread(address + 'human4.jpeg'))
-img.append(cv2.imread(address + 'up4.jpeg'))
-img.append(cv2.imread(address + 'bottomright4.jpeg'))
-img.append(cv2.imread(address + 'upright4.jpeg'))
-img.append(cv2.imread(address + 'bottomleft4.jpeg'))
-img.append(cv2.imread(address + 'upleft4.jpeg'))
+    cv2.imwrite(address + 'result.jpg', out)
 
-cnt = len(img)
-
-'''for i in range(0, cnt):
-    bias = np.ones(img[i].shape, dtype = np.uint8)
-    img[i] = cv2.add(img[i], bias)'''
-
-img[0] = cv2.copyMakeBorder(img[0], img[0].shape[0], 0, img[0].shape[1] // 2,
-                            img[0].shape[1] // 2, cv2.BORDER_CONSTANT, value=[0, 0, 0])
-(row, col) = (img[0].shape[0], img[0].shape[1])
-
-out = img[0]
-
-faces = FaceDetect(img[0])
-hx, hy, hw, hh = faces
-'''
-tst = img[0]
-cv2.rectangle(tst, (hx, hy), (hx + hw, hy + hh), (0, 255, 0), 2)
-cv2.imshow('face', tst)
-cv2.imwrite(address + 'facetest.jpeg', tst)
-'''
-for i in range(1, cnt):
-    img_w = warp(img[i], out)
-    img_w[hy - hh // 4 : row, hx - int(hw * 1.5) : hx + int(hw * 2.5)] = 0
-    mask_origin = cv2.threshold(cv2.cvtColor(out, cv2.COLOR_BGR2GRAY), 0, 255, cv2.THRESH_BINARY)[1]
-    mask_add = cv2.threshold(cv2.cvtColor(img_w, cv2.COLOR_BGR2GRAY), 0, 255, cv2.THRESH_BINARY)[1]
-    out = computeAlphaBlending(out, mask_origin, img_w, mask_add)
-
-cv2.imwrite(address + 'result.jpeg', out)
-
-
-cv2.namedWindow('result', 0)
-cv2.imshow('result', out)
-
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+    cv2.namedWindow('result', 0)
+    cv2.imshow('result', out)
+    cv2.destroyAllWindows()
